@@ -58,11 +58,11 @@ class ShapeChatBot:
     #         else:
     #             total += len(word) * 1.5
     #     return math.ceil(total)
-    
+
     def _calculate_tokens(self, text):
         """Count tokens using GPT-4's actual tokenization"""
         return len(self.encoder.encode(text))
-    
+
     def _truncate_history(self, user_context):
         while (len(user_context['conversation_history']) > self.max_messages or 
                user_context['current_tokens'] > self.max_tokens):
@@ -70,6 +70,12 @@ class ShapeChatBot:
                 break
             removed = user_context['conversation_history'].pop(0)
             user_context['current_tokens'] -= self._calculate_tokens(removed["content"])
+
+    def _calculate_typing_delay(self, text):
+        """Calculate delay based on token count (2 tokens/second) with min 0.5s"""
+        tokens = self._calculate_tokens(text)
+        delay = tokens / 2  # 2 tokens per second
+        return max(delay, 0.5)
 
     def get_response(self, user_id, user_input, is_reminder=False):
         try:
@@ -117,7 +123,7 @@ class ShapeChatBot:
 
         except Exception as e:
             return f"⚠️ Error: {str(e)}"
-        
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chatbot = context.bot_data['chatbot']
@@ -137,7 +143,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Start typing task and processing task concurrently
     typing_task = asyncio.create_task(keep_typing())
-
+    
     try:
         # Get response from API
         loop = asyncio.get_event_loop()
@@ -162,7 +168,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         typing_task.cancel()
         await update.message.reply_text(f"⚠️ Error: {str(e)}")
-
+    
     # Ensure clean task cancellation
     try:
         await typing_task
