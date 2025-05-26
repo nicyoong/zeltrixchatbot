@@ -137,3 +137,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     # Start typing task and processing task concurrently
     typing_task = asyncio.create_task(keep_typing())
+
+    try:
+        # Get response from API
+        loop = asyncio.get_event_loop()
+        response_text = await loop.run_in_executor(
+            None, 
+            chatbot.get_response, 
+            user.id, 
+            update.message.text
+        )
+        
+        tokens = chatbot._calculate_tokens(response_text)
+        typing_delay = chatbot._calculate_typing_delay(response_text)
+        
+        print(f"\n⌨️ Response ready in {typing_delay:.1f}s | {tokens} tokens")
+        
+        await asyncio.sleep(typing_delay)
+        
+        # Send message and IMMEDIATELY cancel typing
+        await update.message.reply_text(response_text)
+        typing_task.cancel()
+        
+    except Exception as e:
+        typing_task.cancel()
+        await update.message.reply_text(f"⚠️ Error: {str(e)}")
