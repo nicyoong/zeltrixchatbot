@@ -162,3 +162,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         typing_task.cancel()
         await update.message.reply_text(f"⚠️ Error: {str(e)}")
+
+    # Ensure clean task cancellation
+    try:
+        await typing_task
+    except asyncio.CancelledError:
+        pass
