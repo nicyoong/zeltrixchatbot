@@ -47,17 +47,21 @@ class ShapeChatBot:
             now = time.time()
             self.request_timestamps = [t for t in self.request_timestamps if now - t < 60]
 
-    def _is_ascii_word(self, word):
-        return all(ord(c) <= 127 for c in word)
+    # def _is_ascii_word(self, word):
+    #     return all(ord(c) <= 127 for c in word)
 
+    # def _calculate_tokens(self, text):
+    #     total = 0.0
+    #     for word in text.split():
+    #         if self._is_ascii_word(word):
+    #             total += 1.3
+    #         else:
+    #             total += len(word) * 1.5
+    #     return math.ceil(total)
+    
     def _calculate_tokens(self, text):
-        total = 0.0
-        for word in text.split():
-            if self._is_ascii_word(word):
-                total += 1.3
-            else:
-                total += len(word) * 1.5
-        return math.ceil(total)
+        """Count tokens using GPT-4's actual tokenization"""
+        return len(self.encoder.encode(text))
     
     def _truncate_history(self, user_context):
         while (len(user_context['conversation_history']) > self.max_messages or 
