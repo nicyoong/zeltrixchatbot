@@ -204,3 +204,19 @@ async def check_inactive_users(context: ContextTypes.DEFAULT_TYPE):
                 
         except Exception as e:
             print(f"Reminder error for {user_id}: {str(e)}")
+
+def main():
+    chatbot = ShapeChatBot()
+    app = Application.builder().token(os.getenv("ZT_TELEGRAM_BOT_TOKEN")).build()
+    app.bot_data['chatbot'] = chatbot
+    
+    # Set up periodic check every 10 minutes
+    job_queue = app.job_queue
+    job_queue.run_repeating(check_inactive_users, interval=600, first=0)
+    
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    print("Zeltrix Bot is running with inactivity reminders...")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
