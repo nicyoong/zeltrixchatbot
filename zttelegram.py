@@ -117,3 +117,23 @@ class ShapeChatBot:
 
         except Exception as e:
             return f"⚠️ Error: {str(e)}"
+        
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    chatbot = context.bot_data['chatbot']
+
+    async def keep_typing():
+        """Show typing action with random intervals"""
+        try:
+            while True:
+                await context.bot.send_chat_action(
+                    chat_id=user.id,
+                    action=constants.ChatAction.TYPING
+                )
+                wait_time = random.uniform(1.5, 4.5)
+                await asyncio.sleep(wait_time)
+        except asyncio.CancelledError:
+            print(f"    ↳ Typing stopped for {user.id}")
+    
+    # Start typing task and processing task concurrently
+    typing_task = asyncio.create_task(keep_typing())
