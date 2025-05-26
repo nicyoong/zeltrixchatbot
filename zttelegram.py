@@ -168,3 +168,39 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await typing_task
     except asyncio.CancelledError:
         pass
+
+async def check_inactive_users(context: ContextTypes.DEFAULT_TYPE):
+    """Periodic job to check for inactive users"""
+    chatbot = context.bot_data['chatbot']
+    current_time = time.time()
+    
+    # Iterate over a copy to avoid dictionary changed during iteration issues
+    for user_id, user_context in chatbot.user_contexts.copy().items():
+        try:
+            # Skip if context structure is incomplete
+            if 'last_activity' not in user_context or 'reminder_sent' not in user_context:
+                continue
+                
+            last_active = user_context['last_activity']
+            needs_reminder = (
+                (current_time - last_active) >= 3600 and  # 1 hour
+                not user_context['reminder_sent']
+            )
+            
+            if needs_reminder:
+                # Generate reminder through the API
+                response = await asyncio.get_event_loop().run_in_executor(
+                    None,
+                    chatbot.get_response,
+                    user_id,
+                    "Continue the last text",
+                    True  # Mark as reminder to prevent activity update
+                )
+                
+                # Send reminder and update flag
+                await context.bot.send_message(chat_id=user_id, text=response)
+                user_context['reminder_sent'] = True
+                print(f"Sent reminder to {user_id}")
+                
+        except Exception as e:
+            print(f"Reminder error for {user_id}: {str(e)}")
