@@ -66,3 +66,50 @@ class ShapeChatBot:
                 break
             removed = user_context['conversation_history'].pop(0)
             user_context['current_tokens'] -= self._calculate_tokens(removed["content"])
+
+    def get_response(self, user_id, user_input, is_reminder=False):
+        try:
+            # Enforce global rate limit first
+            self._enforce_rate_limit()
+            self.request_timestamps.append(time.time())
+
+            # Handle user context
+            if user_id not in self.user_contexts:
+                self.user_contexts[user_id] = {
+                    'conversation_history': [],
+                    'current_tokens': 0,
+                    'last_activity': time.time(),
+                    'reminder_sent': False
+                }
+            uc = self.user_contexts[user_id]
+
+            # Update activity and reset reminder flag for real user messages
+            if not is_reminder:
+                uc['last_activity'] = time.time()
+                uc['reminder_sent'] = False
+
+            # Add user message
+            uc['conversation_history'].append({"role": "user", "content": user_input})
+            uc['current_tokens'] += self._calculate_tokens(user_input)
+
+            print(f"User ID: {user_id}")
+            print(f"Token Count for current User ID: {uc['current_tokens']}")
+
+            # Get API response
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=uc['conversation_history']
+            )
+            ai_response = response.choices[0].message.content
+            
+            # Add AI response
+            uc['conversation_history'].append({"role": "assistant", "content": ai_response})
+            uc['current_tokens'] += self._calculate_tokens(ai_response)
+
+            # Truncate history
+            self._truncate_history(uc)
+
+            return ai_response
+
+        except Exception as e:
+            return f"⚠️ Error: {str(e)}"
