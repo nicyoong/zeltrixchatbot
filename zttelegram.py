@@ -39,3 +39,11 @@ class ShapeChatBot:
             else:
                 total += len(word) * 1.5
         return math.ceil(total)
+    
+    def _truncate_history(self, user_context):
+        while (len(user_context['conversation_history']) > self.max_messages or 
+               user_context['current_tokens'] > self.max_tokens):
+            if not user_context['conversation_history']:
+                break
+            removed = user_context['conversation_history'].pop(0)
+            user_context['current_tokens'] -= self._calculate_tokens(removed["content"])
