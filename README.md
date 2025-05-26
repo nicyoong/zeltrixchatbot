@@ -1,2 +1,2 @@
 # zeltrixchatbot
-Shapes API based chatbot
+Shapes API based chatbot for Telegram
