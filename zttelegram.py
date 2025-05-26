@@ -28,6 +28,25 @@ class ShapeChatBot:
 
         self.encoder = tiktoken.get_encoding("cl100k_base")
 
+    def _enforce_rate_limit(self):
+        """Ensure we don't exceed 5 requests per minute (global limit)"""
+        now = time.time()
+        # Clean up old requests
+        self.request_timestamps = [t for t in self.request_timestamps if now - t < 60]
+        
+        # Check if we need to wait
+        while len(self.request_timestamps) >= self.rate_limit:
+            oldest = self.request_timestamps[0]
+            required_wait = oldest + 60 - now + 0.1  # Small buffer
+            
+            if required_wait > 0:
+                print(f"⚠️ Rate limit exceeded. Waiting {required_wait:.1f} seconds...")
+                time.sleep(required_wait)
+            
+            # Update tracking after waiting
+            now = time.time()
+            self.request_timestamps = [t for t in self.request_timestamps if now - t < 60]
+
     def _is_ascii_word(self, word):
         return all(ord(c) <= 127 for c in word)
 
