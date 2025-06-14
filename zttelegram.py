@@ -157,7 +157,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         tokens = chatbot._calculate_tokens(response_text)
         typing_delay = chatbot._calculate_typing_delay(response_text)
         
-        print(f"\n⌨️ Response ready in {typing_delay:.1f}s | {tokens} tokens")
+        print(f"\n Response ready in {typing_delay:.1f}s | {tokens} tokens")
         
         await asyncio.sleep(typing_delay)
         
@@ -238,6 +238,12 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("ℹ️ No conversation history to reset.")
 
+async def roll_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """/roll – roll a six-sided dice."""
+    result = random.randint(1, 6)
+    await update.message.reply_text(f"🎲 You rolled: *{result}*",
+                                    parse_mode="Markdown")
+
 def main():
     chatbot = ShapeChatBot()
     app = Application.builder().token(os.getenv("ZT_TELEGRAM_BOT_TOKEN")).build()
@@ -246,6 +252,7 @@ def main():
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("reset", reset_command))
+    app.add_handler(CommandHandler("roll", roll_command))
     
     # Set up periodic check every 10 minutes
     job_queue = app.job_queue
