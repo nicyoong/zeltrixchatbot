@@ -245,15 +245,7 @@ async def roll_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                     parse_mode="Markdown")
 
 
-async def main():
-    # 1) Initialize bot & app
-    chatbot = ShapeChatBot()
-    app = Application.builder() \
-        .token(os.getenv("ZT_TELEGRAM_BOT_TOKEN")) \
-        .build()
-    app.bot_data['chatbot'] = chatbot
-
-    # 2) Register your commands (must await)
+async def _register_commands(app: Application):
     await app.bot.set_my_commands([
         BotCommand("start", "Welcome message"),
         BotCommand("help",  "List available commands"),
@@ -261,22 +253,25 @@ async def main():
         BotCommand("roll",  "Roll a six-sided dice"),
     ])
 
-    # 3) Add handlers
+def main():
+    load_dotenv()
+    chatbot = ShapeChatBot()
+    app = Application.builder() \
+        .token(os.getenv("ZT_TELEGRAM_BOT_TOKEN")) \
+        .post_init(_register_commands) \
+        .build()
+    app.bot_data['chatbot'] = chatbot
+
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help",  help_command))
     app.add_handler(CommandHandler("reset", reset_command))
     app.add_handler(CommandHandler("roll",  roll_command))
-
-    # 4) Inactivity reminders
-    job_queue = app.job_queue
-    job_queue.run_repeating(check_inactive_users, interval=600, first=0)
-
-    # 5) Fallback for regular messages
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-    print("Zeltrix Bot is running with start, help, reset, and roll commands…")
-    await app.run_polling()
+    app.job_queue.run_repeating(check_inactive_users, interval=600, first=0)
+
+    print("Bot is running...")
+    app.run_polling()
 
 if __name__ == "__main__":
-    load_dotenv()
-    asyncio.run(main())
+    main()
