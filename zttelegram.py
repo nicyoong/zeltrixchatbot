@@ -5,7 +5,7 @@ import math
 import time
 from dotenv import load_dotenv
 from telegram import Update, constants
-from telegram.ext import Application, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, MessageHandler, filters, ContextTypes, CommandHandler
 import asyncio
 import tiktoken
 
@@ -211,10 +211,41 @@ async def check_inactive_users(context: ContextTypes.DEFAULT_TYPE):
         except Exception as e:
             print(f"Reminder error for {user_id}: {str(e)}")
 
+async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /start: greet the user."""
+    await update.message.reply_text(
+        "👋 Hi there! I’m ShapeChatBot. Send me any message and I’ll reply. "
+        "You can also use /help to see what I can do."
+    )
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /help: list available commands."""
+    help_text = (
+        "Here are the commands you can use:\n\n"
+        "/start – Welcome message\n"
+        "/help  – Show this help text\n"
+        "/reset – Clear our conversation history\n"
+    )
+    await update.message.reply_text(help_text)
+
+async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /reset: clear the user’s context history."""
+    user_id = update.effective_user.id
+    chatbot: ShapeChatBot = context.bot_data['chatbot']
+    if user_id in chatbot.user_contexts:
+        del chatbot.user_contexts[user_id]
+        await update.message.reply_text("✅ Your conversation history has been reset.")
+    else:
+        await update.message.reply_text("ℹ️ No conversation history to reset.")
+
 def main():
     chatbot = ShapeChatBot()
     app = Application.builder().token(os.getenv("ZT_TELEGRAM_BOT_TOKEN")).build()
     app.bot_data['chatbot'] = chatbot
+
+    app.add_handler(CommandHandler("start", start_command))
+    app.add_handler(CommandHandler("help", help_command))
+    app.add_handler(CommandHandler("reset", reset_command))
     
     # Set up periodic check every 10 minutes
     job_queue = app.job_queue
