@@ -4,7 +4,7 @@ import os
 import math
 import time
 from dotenv import load_dotenv
-from telegram import Update, constants
+from telegram import Update, constants, BotCommand
 from telegram.ext import Application, MessageHandler, filters, ContextTypes, CommandHandler
 import asyncio
 import tiktoken
@@ -248,6 +248,13 @@ def main():
     chatbot = ShapeChatBot()
     app = Application.builder().token(os.getenv("ZT_TELEGRAM_BOT_TOKEN")).build()
     app.bot_data['chatbot'] = chatbot
+
+    app.bot.set_my_commands([
+        BotCommand("start", "Welcome message"),
+        BotCommand("help",  "List available commands"),
+        BotCommand("reset", "Clear our conversation history"),
+        BotCommand("roll",  "Roll a six-sided dice"),
+    ])
 
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
