@@ -6,12 +6,22 @@ Click [here](https://t.me/zeltrixbot) to start a chat with the bot, subject to a
 
 ---
 
-### What it does:
-- Chats with you using AI through Telegram messages.
-- Remembers past messages to keep the conversation flowing.
-- Sends a reminder if you’ve been inactive for an hour.
-- Shows a “typing” indicator while it’s thinking of a reply.
-- Manages conversation length to keep things smooth and quick.
+## 🌟 Key Features
+
+### 🧠 Context-Aware Memory
+- Remembers your conversation history
+- Maintains context between messages
+- Builds on previous discussions naturally
+
+### ⏱️ Human-Like Responses
+- Shows "typing" indicators like a real person
+- Replies at natural conversation speed
+- Adjusts response timing based on complexity
+
+### 🔔 Smart Reminders
+- Gently reminds you to continue after 1 hour of inactivity
+- Picks up conversations right where you left off
+- Only reminds when you have an active discussion
 
 ---
 
@@ -19,6 +29,17 @@ Click [here](https://t.me/zeltrixbot) to start a chat with the bot, subject to a
 1. Start a chat with the bot on Telegram.
 2. Send any message and get an AI-generated reply.
 3. Keep chatting or come back later—if you stop for an hour, the bot will send a friendly reminder to continue.
+
+---
+
+## 📋 Commands Guide
+
+| Command | What It Does | Example |
+|---------|--------------|---------|
+| **/start** | Welcome message and introduction | `/start` |
+| **/help** | Shows available commands | `/help` |
+| **/reset** | Clears conversation history | `/reset` |
+| **/roll** | Rolls a six-sided dice | `/roll` |
 
 ---
 
