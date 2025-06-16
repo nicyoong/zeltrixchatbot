@@ -2,7 +2,7 @@
 
 Zeltrix Bot is a Telegram chatbot that chats with you using AI. It remembers your conversation and replies thoughtfully. If you stop chatting for a while, it will gently remind you to continue.
 
-Click [here](https://t.me/zeltrixbot) to start a chat with the bot, subject to availability!
+Click [here](https://t.me/zeltrixbot) to start a Telegram chat with the bot, subject to availability!
 
 ---
 
@@ -43,4 +43,4 @@ Click [here](https://t.me/zeltrixbot) to start a chat with the bot, subject to a
 
 ---
 
-Enjoy chatting with Zeltrix Bot!
+Enjoy chatting with Zeltrix Telegram Bot!
