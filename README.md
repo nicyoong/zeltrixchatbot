@@ -2,6 +2,14 @@
 
 **Welcome to Zeltrix Bot!** This guide will help you have natural, flowing conversations with your AI companion on Telegram. No technical knowledge needed - just follow these simple steps.
 
+**Powered by Meta's Llama 3.1 technology** - Enjoy smarter, more natural conversations on Telegram.
+
+---
+
+## 🧠 About Our AI: Llama 3.1 8B
+
+Zeltrix Bot uses **Meta's advanced Llama 3.1 8B model** - here's what this means for your experience:
+
 ---
 
 ## 🚀 First-Time Setup
